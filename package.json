@@ -1,0 +1,23 @@
+{
+  "name": "devpeoplesbackend",
+  "version": "1.0.0",
+  "description": "backend of DevPeoples",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev":"nodemon src/app.js",
+    "start":"node src/app.js"
+  },
+  "keywords": [
+    "nodejs",
+    "javascript",
+    "backend",
+    "aws",
+    "pm2"
+  ],
+  "author": "Deepak Maurya",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
