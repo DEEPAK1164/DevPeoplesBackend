@@ -1,21 +1,16 @@
 const express = require('express');
 const app = express();
+const {adminAuth}=require("./middlewares/auth");
 
-app.get("/user/:userId",(req, res) => {
-  res.send(req.params);
+app.get("/admin", adminAuth);
+
+app.get("/admin/getAllData", (req, res) => {
+  res.send("Admin data retrieved successfully!");
 });
 
-
-app.post("/user",(req, res) => {
-  res.send("Data saved successfully to DB");
+app.get("/", (req, res) => {
+  res.send("Welcome to the home page!");
 });
-
-
-
-app.delete("/user",(req, res) => {
-  res.send("Data deleted successfully from DB");
-});
-
 
 const PORT = 7777;
 app.listen(PORT, () => {
