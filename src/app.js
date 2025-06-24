@@ -2,13 +2,15 @@ const express = require('express');
 const app = express();
 
 app.get('/', (req, res) => {
-  try {
-    // Simulate an error
-    throw new Error("Error caught by try-catch!");
-    res.send("This will not run.");
-  } catch (err) {
-    res.status(500).send("Handled by try-catch: " + err.message);
-  }
+  // Simulate an error (no try-catch here)
+  throw new Error("Error caught by middleware!");
+  res.send("This will not run.");
+});
+
+// Error handler middleware (should be last)
+app.use((err, req, res, next) => {
+  console.error(err.message);
+  res.status(500).send("Handled by middleware: " + err.message);
 });
 
 const PORT = 7777;
