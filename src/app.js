@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 
-app.get('/try-catch', (req, res) => {
+app.get('/', (req, res) => {
   try {
     // Simulate an error
     throw new Error("Error caught by try-catch!");
