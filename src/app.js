@@ -1,11 +1,17 @@
 const express = require('express');
-// Importing the database configuration
-require("./config/database");
-// Initialize the Express application
 const app = express();
 
+// Importing the database configuration
+const connectDB = require("./config/database");
 
 const PORT = 7777;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+
+
+connectDB().then(() => {
+  console.log('Database connected successfully');
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}).catch(err => {
+  console.error('Database connection failed:', err);
 });
