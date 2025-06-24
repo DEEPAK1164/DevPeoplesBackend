@@ -1,15 +1,15 @@
 const express = require('express');
 const app = express();
 
-app.get("/", (req, res) => {
-  throw new Error("An unexpected error occurred!");
-  res.send("Hello, World!");
-})
-
-app.use((err, req, res, next) => {
-  console.error(err.message);
- res.status(500).send(`Something went wrong! Please try again later. Error: ${err.message}`);
-})
+app.get('/try-catch', (req, res) => {
+  try {
+    // Simulate an error
+    throw new Error("Error caught by try-catch!");
+    res.send("This will not run.");
+  } catch (err) {
+    res.status(500).send("Handled by try-catch: " + err.message);
+  }
+});
 
 const PORT = 7777;
 app.listen(PORT, () => {
