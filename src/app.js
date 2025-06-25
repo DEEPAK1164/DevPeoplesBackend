@@ -32,6 +32,46 @@ app.get("/feed", async (req, res) => {
   }
 });
 
+//delete by id
+app.delete("/delete/:id", async (req, res) => {
+  const userId = req.params.id;
+  try {
+    // Deleting the user by ID
+    const result = await UserModel.findByIdAndDelete({_id:userId});
+    console.log(result)
+    if (result) {
+      res.send("User deleted successfully");
+    } else {
+      res.status(404).send("User not found");
+    }
+  } catch (err) {
+    console.error("Error deleting user:", err.message);
+    res.status(500).send("Error deleting user: " + err.message);
+  }
+})
+
+
+//update user by id using body use patch method
+app.patch("/update/:id", async (req, res) => {
+  const userId = req.params.id;
+  try {
+    // Updating the user by ID
+    const result = await UserModel.findByIdAndUpdate(
+      {_id: userId},
+      req.body,
+      { new: true } // Return the updated document
+    );
+    if (result) {
+      res.send("User updated successfully");
+    } else {
+      res.status(404).send("User not found");
+    }
+  } catch (err) {
+    console.error("Error updating user:", err.message);
+    res.status(500).send("Error updating user: " + err.message);
+  }
+});
+
 
 
 const PORT = 7777;
