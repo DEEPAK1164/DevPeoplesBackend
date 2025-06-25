@@ -1,20 +1,15 @@
 const express = require('express');
 const app = express();
+app.use(express.json()); // Middleware to parse JSON bodies
 // Importing the database configuration
 const connectDB = require("./config/database");
 const UserModel = require("./models/user");
 
 app.post("/signup", async (req, res) => {
+console.log(req.body);
   try {
-    const userObj = {
-      firstName: "Virat",
-      lastName: "Kohli",
-      emailId: "virat@gmail.com",
-      password: "Virat@123"
-    };
-
     // Creating a new user instance using the UserModel
-    const user = new UserModel(userObj);
+    const user = new UserModel(req.body);
     // Saving the user to the database
     await user.save(); // this will return a promise
     res.send("User created successfully");
@@ -24,8 +19,8 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-const PORT = 7777;
 
+const PORT = 7777;
 connectDB().then(() => {
   console.log('Database connected successfully');
   app.listen(PORT, () => {

@@ -6,8 +6,9 @@ const userSchema=new mongoose.Schema({
         minLength:4
     },
     lastName:{
-        type:String
-
+        type:String,
+        required:true,
+        minLength:4
     },
     emailId:{
         type:String,
@@ -22,7 +23,7 @@ const userSchema=new mongoose.Schema({
     }
 },
 {
-    timestamps:true,//it tells when user registered
+    timestamps:true, //it tells when user registered
 }
 );
 
