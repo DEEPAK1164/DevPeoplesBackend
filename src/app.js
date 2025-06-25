@@ -20,6 +20,20 @@ console.log(req.body);
 });
 
 
+app.get("/feed", async (req, res) => {
+  try {
+    // Fetching all users from the database
+    const users = await UserModel.find({});
+    res.send(users);
+
+   }catch(err){
+    console.error("Error fetching users:", err.message);
+    res.status(500).send("Error fetching users: " + err.message);
+  }
+});
+
+
+
 const PORT = 7777;
 connectDB().then(() => {
   console.log('Database connected successfully');
