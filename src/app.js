@@ -37,7 +37,7 @@ app.delete("/delete/:id", async (req, res) => {
   const userId = req.params.id;
   try {
     // Deleting the user by ID
-    const result = await UserModel.findByIdAndDelete({_id:userId});
+    const result = await UserModel.findByIdAndDelete(userId); // <-- Pass the ID string directly
     console.log(result)
     if (result) {
       res.send("User deleted successfully");
@@ -57,9 +57,9 @@ app.patch("/update/:id", async (req, res) => {
   try {
     // Updating the user by ID
     const result = await UserModel.findByIdAndUpdate(
-      {_id: userId},
+      userId, // <-- Pass the ID string directly
       req.body,
-      { new: true } // Return the updated document
+      { runValidators: true, new: true } // runValidators ensures that the update respects the schema validation rules, new:true returns the updated document
     );
     if (result) {
       res.send("User updated successfully");
