@@ -51,11 +51,25 @@ app.delete("/delete/:id", async (req, res) => {
 })
 
 
-//update user by id using body use patch method
+
 app.patch("/update/:id", async (req, res) => {
-  const userId = req.params.id;
+  const userId = req.params?.id;
+
   try {
-    // Updating the user by ID
+    
+   // API Level Validations 
+   const ALLOWED_UPDATES=["photoUrl","about","gender","age","skills"];
+  const isUpdateAllowed = Object.keys(req.body).every((key) => ALLOWED_UPDATES.includes(key));
+  const skillsLength = Array.isArray(req.body.skills) ? req.body.skills.length : 0;
+
+if (
+  !isUpdateAllowed ||
+  skillsLength > 7 ||
+  skillsLength < 1
+) {
+  throw new Error("Invalid update fields, Updates not allowed for these fields");
+}
+
     const result = await UserModel.findByIdAndUpdate(
       userId, // <-- Pass the ID string directly
       req.body,
