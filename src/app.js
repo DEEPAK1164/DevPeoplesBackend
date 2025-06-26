@@ -4,10 +4,16 @@ app.use(express.json()); // Middleware to parse JSON bodies
 // Importing the database configuration
 const connectDB = require("./config/database");
 const UserModel = require("./models/user");
+const{validateSignUpData} = require("./utils/validation");
 
-app.post("/signup", async (req, res) => {
-console.log(req.body);
+
+   app.post("/signup", async (req, res) => {
+
+
+
   try {
+   validateSignUpData(req); // Validate the signup data
+
     // Creating a new user instance using the UserModel
     const user = new UserModel(req.body);
     // Saving the user to the database
