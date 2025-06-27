@@ -1,5 +1,8 @@
 const mongoose=require("mongoose");
 const validator=require("validator");
+const bcrypt=require("bcryptjs");
+const jwt=require("jsonwebtoken");
+
 const userSchema=new mongoose.Schema({
     firstName:{
         type:String,
@@ -62,6 +65,23 @@ const userSchema=new mongoose.Schema({
     timestamps:true,//it tells when user registered
 }
 );
+
+
+userSchema.methods.getJwtToken=async function(){
+ const user=this;
+ const jwttoken= await jwt.sign({_id: user._id }, "DevPeoples#pyG4XsLkN", { expiresIn: "1d" }); // Generate a JWT token
+    return jwttoken;
+}
+
+
+
+userSchema.methods.validatePassword=async function(passwordInputByUser){
+ const user=this;
+ const hashedPassword=user.password; // Get the hashed password from the user document
+    const isPasswordValid=await bcrypt.compare( passwordInputByUser, hashedPassword); // Compare the provided password with the hashed password in the database
+
+    return isPasswordValid; // Return true if the password is valid, false otherwise
+}
 
 const UserModel=mongoose.model("User",userSchema);
 

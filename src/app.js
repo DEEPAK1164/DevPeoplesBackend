@@ -44,12 +44,14 @@ app.post("/login", async (req, res) => {
       throw new Error("Invalid Credentials: User not found");
     }
   
-     const isPasswordValid=await bcrypt.compare(password, user.password); // Compare the provided password with the hashed password in the database
+    //  const isPasswordValid=await bcrypt.compare(password, user.password); // Compare the provided password with the hashed password in the database
+    const isPasswordValid = await user.validatePassword(password); // Using the method defined in the UserModel to compare passwords
     if (!isPasswordValid) {
       throw new Error("Invalid Credentials: User not found");
     }
 
-   const jwttoken=jwt.sign({_id: user._id }, "DevPeoples#pyG4XsLkN", { expiresIn: "1d" }); // Generate a JWT token
+  //  const jwttoken=jwt.sign({_id: user._id }, "DevPeoples#pyG4XsLkN", { expiresIn: "1d" }); // Generate a JWT token
+      const jwttoken = await user.getJwtToken(); // Using the method defined in the UserModel to get the JWT token
   
     // If the user is found and the password is valid, send a success response
     res.cookie("token", jwttoken, { httpOnly: true, secure: true, maxAge: 24 * 60 * 60 * 1000 }); // Set the token in a cookie
