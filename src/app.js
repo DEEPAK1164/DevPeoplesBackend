@@ -6,6 +6,9 @@ const connectDB = require("./config/database");
 const UserModel = require("./models/user");
 const{validateSignUpData} = require("./utils/validation");
 const bcrypt=require("bcrypt");
+const cookieParser = require('cookie-parser');
+app.use(cookieParser()); // Middleware to parse cookies
+const jwt=require("jsonwebtoken");
 
 app.post("/signup", async (req, res) => {
   try {
@@ -43,13 +46,41 @@ app.post("/login", async (req, res) => {
     if (!isPasswordValid) {
       throw new Error("Invalid Credentials: User not found");
     }
+
+   const jwttoken=jwt.sign({_id: user._id }, "DevPeoples#pyG4XsLkN", { expiresIn: "10s" }); // Generate a JWT token
+  
     // If the user is found and the password is valid, send a success response
+    res.cookie("token", jwttoken, { httpOnly: true, secure: true }); // Set the token in a cookie
+    console.log("Cookie set with token:", jwttoken);
     res.send("Login successful");
   } catch (err) {
     console.error("Login error:", err.message);
     res.status(500).send("Error during login: " + err.message);
   }
 });
+
+
+app.get("/profile", async (req, res) => {
+  try {
+    const cookies = req.cookies;
+    const { token } = cookies; // Extracting the token from cookies
+    const decodedMessage = jwt.verify(token, "DevPeoples#pyG4XsLkN");
+    console.log("Decoded JWT:", decodedMessage);
+    const { _id } = decodedMessage; // Extracting the user ID from the decoded token
+
+    // Find user by id (await the promise)
+    const user = await UserModel.findById(_id);
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    res.send(user);
+  } catch (err) {
+    console.error("Profile error:", err.message);
+    res.status(401).send("Invalid or expired token");
+  }
+})
+
+
 
 
 app.get("/feed", async (req, res) => {
@@ -117,7 +148,6 @@ if (
     res.status(500).send("Error updating user: " + err.message);
   }
 });
-
 
 
 const PORT = 7777;
