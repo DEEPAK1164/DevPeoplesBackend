@@ -9,6 +9,8 @@ const bcrypt=require("bcrypt");
 const cookieParser = require('cookie-parser');
 app.use(cookieParser()); // Middleware to parse cookies
 const jwt=require("jsonwebtoken");
+const { userAuth } = require("./middlewares/auth"); // Importing the authentication middleware
+
 
 app.post("/signup", async (req, res) => {
   try {
@@ -47,10 +49,10 @@ app.post("/login", async (req, res) => {
       throw new Error("Invalid Credentials: User not found");
     }
 
-   const jwttoken=jwt.sign({_id: user._id }, "DevPeoples#pyG4XsLkN", { expiresIn: "10s" }); // Generate a JWT token
+   const jwttoken=jwt.sign({_id: user._id }, "DevPeoples#pyG4XsLkN", { expiresIn: "1d" }); // Generate a JWT token
   
     // If the user is found and the password is valid, send a success response
-    res.cookie("token", jwttoken, { httpOnly: true, secure: true }); // Set the token in a cookie
+    res.cookie("token", jwttoken, { httpOnly: true, secure: true, maxAge: 24 * 60 * 60 * 1000 }); // Set the token in a cookie
     console.log("Cookie set with token:", jwttoken);
     res.send("Login successful");
   } catch (err) {
@@ -60,19 +62,9 @@ app.post("/login", async (req, res) => {
 });
 
 
-app.get("/profile", async (req, res) => {
+app.get("/profile", userAuth, async (req, res) => {
   try {
-    const cookies = req.cookies;
-    const { token } = cookies; // Extracting the token from cookies
-    const decodedMessage = jwt.verify(token, "DevPeoples#pyG4XsLkN");
-    console.log("Decoded JWT:", decodedMessage);
-    const { _id } = decodedMessage; // Extracting the user ID from the decoded token
-
-    // Find user by id (await the promise)
-    const user = await UserModel.findById(_id);
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
+   const user=req.user; // Accessing the user from the request object, set by the userAuth middleware
     res.send(user);
   } catch (err) {
     console.error("Profile error:", err.message);
