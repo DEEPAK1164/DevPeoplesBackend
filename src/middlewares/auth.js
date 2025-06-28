@@ -1,5 +1,5 @@
 const jwt=require("jsonwebtoken");
-const UserModel=require("../models/user"); // Assuming you have a user model defined in models
+const User=require("../models/user"); // Assuming you have a user model defined in models
 
 const userAuth=async(req,res,next)=>{
 
@@ -12,7 +12,7 @@ const userAuth=async(req,res,next)=>{
 
     const decodedObj=await jwt.verify(token, "DevPeoples#pyG4XsLkN");
     const{_id}=decodedObj; // Extracting the user ID from the decoded token
-    const user=await UserModel.findById(_id);
+    const user=await User.findById(_id);
     if(!user){
       throw new Error("User not found");
     }

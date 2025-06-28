@@ -55,7 +55,7 @@ const userSchema=new mongoose.Schema({
     }
 },
 {
-    timestamps:true,//it tells when user registered
+    timestamps:true, //it tells when user registered
 }
 );
 
@@ -65,8 +65,7 @@ userSchema.methods.getJWT = async function() {
     const user = this;
     
     try {
-        const token = await jwt.sign({ _id: user._id.toString() }, "D**p@k*1164", { expiresIn: "1d" });
-       
+        const token = await jwt.sign({ _id: user._id.toString() }, "DevPeoples#pyG4XsLkN", { expiresIn: "1d" });
         return token;
     } catch (error) {
         console.error("Error in generating JWT:", error.message);
@@ -85,7 +84,7 @@ userSchema.methods.validatePassword=async function(passwordInputByUser){
     return isPasswordValid; // Return true if the password is valid, false otherwise
 }
 
-const UserModel=mongoose.model("User",userSchema);
+const User=mongoose.model("User",userSchema);
 
 
-module.exports=UserModel;
+module.exports=User;

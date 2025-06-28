@@ -6,11 +6,6 @@ const jwt=require("jsonwebtoken");
 const{validateEditProfileData}=require("../utils/validation");
 const bcrypt = require("bcryptjs");
 
-
-
-
-
-
 // profileRouter.get("/profile/view",userAuth,async(req,res)=>{
 //     try{
 //       const user=req.user;
@@ -60,7 +55,7 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
     }
 
     // Validate the token
-    const decodedMsg = await jwt.verify(cookies.token, "D**p@k*1164");
+    const decodedMsg = await jwt.verify(cookies.token, "DevPeoples#pyG4XsLkN");
     const { _id } = decodedMsg;
     const userData = await User.findById(_id);
 
@@ -68,7 +63,10 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
       throw new Error("User does not exist, or the token may have expired.");
     }
 
-    res.send(userData); // Send user data response if everything is fine
+res.json({
+      message: "Logged In User Is",
+      data: user,
+    });
   } catch (err) {
     res.status(400).send("Error: " + err.message);
   }
@@ -92,16 +90,12 @@ profileRouter.patch("/profile/edit", userAuth, async(req,res)=>{
   Object.keys(req.body).forEach((key)=>(loggedInUser[key]=req.body[key]))
   // console.log(loggedInUser);
     await loggedInUser.save();
-res.send("Edit was successfull!");
-
-
+    res.send("Edit was successfull!");
   }catch(err){
 
   res.status(400).send("ERROR :"+ err?.message);
 
   }
-
-
 })
 
 
@@ -126,9 +120,6 @@ profileRouter.post("/profile/change-password", userAuth, async (req, res) => {
     res.status(400).send("ERROR: " + err.message);
   }
 });
-
-
-
 
 
 
