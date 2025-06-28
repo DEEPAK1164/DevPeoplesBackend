@@ -1,155 +1,35 @@
 const express = require('express');
+const connectDB = require('./config/database'); // Import the database connection
 const app = express();
-app.use(express.json()); // Middleware to parse JSON bodies
-// Importing the database configuration
-const connectDB = require("./config/database");
-const UserModel = require("./models/user");
-const{validateSignUpData} = require("./utils/validation");
-const bcrypt=require("bcrypt");
-const cookieParser = require('cookie-parser');
-app.use(cookieParser()); // Middleware to parse cookies
-const jwt=require("jsonwebtoken");
-const { userAuth } = require("./middlewares/auth"); // Importing the authentication middleware
+var cookieParser = require('cookie-parser')
 
 
-app.post("/signup", async (req, res) => {
-  try {
-   validateSignUpData(req); // Validate the signup data
-   const hashedPassword = await bcrypt.hash(req.body.password, 10); // Hashing the password
-   console.log("Hashed Password:", hashedPassword);
-    // Creating a new user instance using the UserModel
-    const { firstName, lastName, emailId, password} = req.body; // Destructuring with default values
-    const user = new UserModel({
-      firstName,
-      lastName,
-      emailId,
-      password: hashedPassword, // Storing the hashed password
-    });
-    // Saving the user to the database
-    await user.save(); // this will return a promise
-    res.send("User created successfully");
-  } catch (err) {
-    // console.error("Signup error:", err.message);
-    res.status(500).send("Error creating user: " + err.message);
-  }
-});
+
+// Middleware (if any)
+app.use(express.json()); // Example middleware to handle JSON requests
+app.use(cookieParser());
+
+const authRouter=require("./routes/auth");
+const profileRouter=require("./routes/profile");
+const requestRouter=require("./routes/request");
+const userRouter=require("./routes/user");
 
 
-app.post("/login", async (req, res) => {
-  try {
-    const { emailId, password } = req.body; // Using query parameters for login
-   
-    const user= await UserModel.findOne({ emailId :emailId}); // Find the user by emailId
-    if (!user) {
-      throw new Error("Invalid Credentials: User not found");
-    }
-  
-    //  const isPasswordValid=await bcrypt.compare(password, user.password); // Compare the provided password with the hashed password in the database
-    const isPasswordValid = await user.validatePassword(password); // Using the method defined in the UserModel to compare passwords
-    if (!isPasswordValid) {
-      throw new Error("Invalid Credentials: User not found");
-    }
-
-  //  const jwttoken=jwt.sign({_id: user._id }, "DevPeoples#pyG4XsLkN", { expiresIn: "1d" }); // Generate a JWT token
-      const jwttoken = await user.getJwtToken(); // Using the method defined in the UserModel to get the JWT token
-  
-    // If the user is found and the password is valid, send a success response
-    res.cookie("token", jwttoken, { httpOnly: true, secure: true, maxAge: 24 * 60 * 60 * 1000 }); // Set the token in a cookie
-    console.log("Cookie set with token:", jwttoken);
-    res.send("Login successful");
-  } catch (err) {
-    console.error("Login error:", err.message);
-    res.status(500).send("Error during login: " + err.message);
-  }
-});
 
 
-app.get("/profile", userAuth, async (req, res) => {
-  try {
-   const user=req.user; // Accessing the user from the request object, set by the userAuth middleware
-    res.send(user);
-  } catch (err) {
-    console.error("Profile error:", err.message);
-    res.status(401).send("Invalid or expired token");
-  }
+app.use("/",authRouter);
+app.use("/",profileRouter);
+app.use("/",requestRouter);
+app.use("/",userRouter);
+
+
+
+
+connectDB().then(()=>{
+console.log("DB connected successfully!");
+app.listen(7777,()=>{
+  console.log("Server is running on port 7777...")
 })
-
-
-
-
-app.get("/feed", async (req, res) => {
-  try {
-    // Fetching all users from the database
-    const users = await UserModel.find({});
-    res.send(users);
-
-   }catch(err){
-    console.error("Error fetching users:", err.message);
-    res.status(500).send("Error fetching users: " + err.message);
-  }
-});
-
-//delete by id
-app.delete("/delete/:id", async (req, res) => {
-  const userId = req.params.id;
-  try {
-    // Deleting the user by ID
-    const result = await UserModel.findByIdAndDelete(userId); // <-- Pass the ID string directly
-    console.log(result)
-    if (result) {
-      res.send("User deleted successfully");
-    } else {
-      res.status(404).send("User not found");
-    }
-  } catch (err) {
-    console.error("Error deleting user:", err.message);
-    res.status(500).send("Error deleting user: " + err.message);
-  }
+}).catch((err)=>{
+console.error("DB can't be connected");
 })
-
-
-
-app.patch("/update/:id", async (req, res) => {
-  const userId = req.params?.id;
-
-  try {
-    
-   // API Level Validations 
-   const ALLOWED_UPDATES=["photoUrl","about","gender","age","skills"];
-  const isUpdateAllowed = Object.keys(req.body).every((key) => ALLOWED_UPDATES.includes(key));
-  const skillsLength = Array.isArray(req.body.skills) ? req.body.skills.length : 0;
-
-if (
-  !isUpdateAllowed ||
-  skillsLength > 7 ||
-  skillsLength < 1
-) {
-  throw new Error("Invalid update fields, Updates not allowed for these fields");
-}
-
-    const result = await UserModel.findByIdAndUpdate(
-      userId, // <-- Pass the ID string directly
-      req.body,
-      { runValidators: true, new: true } // runValidators ensures that the update respects the schema validation rules, new:true returns the updated document
-    );
-    if (result) {
-      res.send("User updated successfully");
-    } else {
-      res.status(404).send("User not found");
-    }
-  } catch (err) {
-    console.error("Error updating user:", err.message);
-    res.status(500).send("Error updating user: " + err.message);
-  }
-});
-
-
-const PORT = 7777;
-connectDB().then(() => {
-  console.log('Database connected successfully');
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}).catch(err => {
-  console.error('Database connection failed:', err);
-});

@@ -1,6 +1,5 @@
 const mongoose=require("mongoose");
-const validator=require("validator");
-const bcrypt=require("bcryptjs");
+var validator = require('validator');
 const jwt=require("jsonwebtoken");
 
 const userSchema=new mongoose.Schema({
@@ -45,13 +44,7 @@ const userSchema=new mongoose.Schema({
     },
     photoUrl:{
         type:String,
-        default:"https://geographyandyou.com/images/user-profile.png",
-         validate(value){
-            if(!validator.isURL(value))
-            {
-               throw new Error("Invalid Photo Url "+value)
-            }
-        },
+        default:"https://geographyandyou.com/images/user-profile.png"
     },
     about:{
        type:String,
@@ -67,11 +60,20 @@ const userSchema=new mongoose.Schema({
 );
 
 
-userSchema.methods.getJwtToken=async function(){
- const user=this;
- const jwttoken= await jwt.sign({_id: user._id }, "DevPeoples#pyG4XsLkN", { expiresIn: "1d" }); // Generate a JWT token
-    return jwttoken;
-}
+//Must not use arrow fn ever just below
+userSchema.methods.getJWT = async function() {
+    const user = this;
+    
+    try {
+        const token = await jwt.sign({ _id: user._id.toString() }, "D**p@k*1164", { expiresIn: "1d" });
+       
+        return token;
+    } catch (error) {
+        console.error("Error in generating JWT:", error.message);
+        throw new Error("Token generation failed.");
+    }
+};
+
 
 
 
