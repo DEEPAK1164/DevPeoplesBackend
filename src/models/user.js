@@ -15,7 +15,8 @@ const userSchema=new mongoose.Schema({
     emailId:{
         type:String,
         required:true,
-        unique:true,
+        unique:true,// note if we make any field unique then mongoDb automatically creates an index for that field
+        //index:true, //if we want to create index manually then use this line
         lowercase:true,
         trim:true  ,//avoid spaces before in and after while entering email
         validate(value){
@@ -58,6 +59,13 @@ const userSchema=new mongoose.Schema({
     timestamps:true, //it tells when user registered
 }
 );
+
+userSchema.index({firstName:1, lastName:1}); // Create a compound index on firstName and lastName for faster queries
+
+//why we should not create a lot of indexes?
+//because it will slow down the write operations like insert, update, delete
+//because every time we write something in the database, it has to update the indexes as well, which takes time
+//so we should only create indexes on the fields that are frequently queried or searched
 
 
 //Must not use arrow fn ever just below

@@ -33,8 +33,8 @@ if(!toUser)
 
 
 //if there is an existing ConnectionRequest
-//if conn req from p1 to p1 already exist or
-//if there is con req already pending from b to a
+//if conn req from p1 to p2 already exist or
+//if there is con req already pending from p1 to p2
 //in both cases user not allowed to send con request
 const existingConnectionRequest=await ConnectionRequestModel.findOne({
   $or:[
@@ -45,15 +45,9 @@ const existingConnectionRequest=await ConnectionRequestModel.findOne({
 
 if(existingConnectionRequest)
 {
-  console.log(existingConnectionRequest)
+  //console.log(existingConnectionRequest)
   return res.status(400).send({message:"Connection Request Already Exists!"})
 }
-
-
-
-
-
-
 
 
 const connectionRequest=new ConnectionRequestModel({
@@ -63,16 +57,6 @@ const connectionRequest=new ConnectionRequestModel({
 })
 
 const data=await connectionRequest.save();
-
-
-const emailRes=await sendEmail.run(
-  "A new friend request from "+req.user.firstName,
-  req.user.firstName+" is "+status+" in "+toUser.firstName
-);
-
-// console.log(emailRes);
-
-
 
 
 res.json({
