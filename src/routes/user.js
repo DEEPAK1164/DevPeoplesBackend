@@ -2,7 +2,7 @@ const express=require("express");
 const { userAuth } = require("../middlewares/auth");
 const userRouter=express.Router();
 const ConnectionRequestModel=require("../models/connectionRequest")
-const UserModel=require("../models/user")
+const User=require("../models/user")
 const USER_SAFE_DATA="firstName lastName photoUrl age gender about skills";
 
 
@@ -11,13 +11,15 @@ const USER_SAFE_DATA="firstName lastName photoUrl age gender about skills";
 userRouter.get("/user/requests/received", userAuth, async(req,res)=>{
     try{
         const loggedInUser=req.user;
+        //find returns atray of objects
+        //findOne returns single object
         const connectionRequests=await ConnectionRequestModel.find({
               toUserId:loggedInUser._id,
               status:"interested"
-        }).populate("fromUserId",["firstName", "lastName", "age", "gender", "photoUrl", "about"])
+        }).populate("fromUserId",["firstName", "lastName", "age", "gender", "photoUrl", "about"]).populate("toUserId",["firstName", "lastName"])
 
 
-    res.json({message:"Data fetched successfully!",
+    res.json({message:"Requests fetched successfully!",
         data:connectionRequests
     })
     } catch(err){
@@ -35,7 +37,7 @@ const loggedInUser=req.user;
 //ex akshay=>elon=>accepted
 //elon=>mark=>accepted
 //suppose I am finding out all the connections of elon
-//then I ahve to check all database in which elon is to user or from user
+//then I have to check all database in which elon is toUserIdd user or fromUserId
 //but status should always be accepted
 
 
@@ -47,8 +49,16 @@ const connectionRequests=await ConnectionRequestModel.find({
 }).populate("fromUserId",USER_SAFE_DATA)
 .populate("toUserId",USER_SAFE_DATA)
 
+
+//waht data find ? it finds all the connection requests where the logged-in user is either the sender or the receiver, and the status is "accepted".
+//so, it will return all the connection requests where the logged-in user is either the sender
 const data=connectionRequests.map((row)=>
 {
+
+    //below logic is used to find out the connection user
+    //if loggedInUser is fromUserId then toUserId is connection user
+    //if loggedInUser is toUserId then fromUserId is connection user
+   
     if(row.fromUserId._id.toString()===loggedInUser._id.toString())
      {
        return  row.toUserId;
@@ -110,7 +120,7 @@ connectionRequests.forEach((req)=>{
 })
 
 // console.log(hideUserFromFeed)
-const feedusers=await UserModel.find({
+const feedusers=await User.find({
     $and:[
 
         {_id:{$nin:Array.from(hideUserFromFeed)}},
