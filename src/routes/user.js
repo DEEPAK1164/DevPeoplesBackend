@@ -84,11 +84,22 @@ userRouter.get("/feed", userAuth, async (req, res) => {
 //user should not see all user cards except
 //1.his own card
 //2.his connections
-//3.ignored people
-//4.already sent the request
+//3.ignored people (ignored)
+//4.already sent the request (interested)
 
-//example : rahul(new),[a,b,c,d]
-// raul->a->rejected, r->b->accepted
+// a,b,c,d,e,f are already registered users
+//example : rahul(new),([a,b,c,d,e,f] in feed)
+// rahul -> a (interested)
+//([b,c,d,e,f] in feed) => rahul should not see a's card in feed
+// rahul -> b (ignored)
+//([c,d,e,f] in feed) => rahul should not see b's card in feed
+// rahul -> c -> (accepted)
+//([d,e,f] in feed) => rahul should not see c's card in feed
+//rahul -> d -> (rejected)
+//([e,f] in feed) => rahul should not see d's card in feed
+// if entry of rahul and x,y,z etc is present in connection request then rahul should not see x,y,z's card in feed
+//a's feed will not contain rahul's card
+
 
         const loggedInUser = req.user; // Assuming req.user contains the logged-in user's information
 
@@ -107,14 +118,17 @@ userRouter.get("/feed", userAuth, async (req, res) => {
                 { toUserId: loggedInUser._id }    // Requests received by the user
             ]
         }).select("fromUserId toUserId")
-        // .populate("fromUserId","firstName")
-        // .populate("toUserId","firstName"); 
+        //.populate("fromUserId","firstName")
+        //.populate("toUserId","firstName"); 
+        // why not populate directly in find? because we want to select only fromUserId and toUserId
+        //why after select? because we want to select only fromUserId and toUserId
+        //can we skip select? yes, but then it will return all the fields of fromUserId and toUserId
 
 
 
 //hidden users are the users whom loggedIn user want to hide from feed
     const hideUserFromFeed=new Set();//stores uniques enteries
-connectionRequests.forEach((req)=>{
+    connectionRequests.forEach((req)=>{
     hideUserFromFeed.add(req.fromUserId.toString());
     hideUserFromFeed.add(req.toUserId.toString());
 })
