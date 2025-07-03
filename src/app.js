@@ -2,12 +2,13 @@ const express = require('express');
 const connectDB = require('./config/database'); // Import the database connection
 const app = express();
 var cookieParser = require('cookie-parser')
-
+const cors = require('cors');
 
 
 // Middleware (if any)
 app.use(express.json()); // Example middleware to handle JSON requests
 app.use(cookieParser());
+app.use(cors())
 
 const authRouter=require("./routes/auth");
 const profileRouter=require("./routes/profile");
