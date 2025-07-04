@@ -8,7 +8,10 @@ const cors = require('cors');
 // Middleware (if any)
 app.use(express.json()); // Example middleware to handle JSON requests
 app.use(cookieParser());
-app.use(cors())
+app.use(cors({
+  origin: 'http://localhost:5173', // Replace with your frontend URL
+  credentials: true // Allow credentials (cookies, authorization headers, etc.)
+}))
 
 const authRouter=require("./routes/auth");
 const profileRouter=require("./routes/profile");
