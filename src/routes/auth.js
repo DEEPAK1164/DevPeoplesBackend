@@ -1,6 +1,6 @@
 const express=require("express");
 const authRouter=express.Router();
-const jwt=require("jsonwebtoken");
+
 const {validateSignUpData}=require('../utils/validation');
 const User = require('../models/user');
 const bcrypt=require("bcrypt");
@@ -51,7 +51,6 @@ authRouter.post('/signup', async (req, res) => {
 
   } catch (err) {
     // Log the error internally for debugging, but send a generic error message to the client
-  
     res.status(400).send("Error saving the user. Please try again.");
   }
 });
@@ -109,16 +108,15 @@ authRouter.post("/login",async(req,res)=>{
  authRouter.post("/logout", (req, res) => {
   // Clear the token cookie
   res.cookie("token", null, {
-    expires: new Date(Date.now()), // Expire the cookie immediately
-    httpOnly: true // Optionally, secure the cookie with httpOnly
-  });
+  httpOnly: true,
+  secure: false,         // true for HTTPS
+  sameSite: 'lax',       // or 'none' for HTTPS
+  expires: new Date(Date.now())
+});
 
   // Send the logout success message
   res.send("Logout Successful!!");
 });
-
-
-
 
 
 module.exports=authRouter;

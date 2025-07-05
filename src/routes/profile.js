@@ -1,7 +1,7 @@
 const express=require("express");
 const User = require('../models/user');
 const profileRouter=express.Router();
-const {userAuth}=require("../middlewares/auth")
+const {userAuth}=require("../middlewares/auth");
 const jwt=require("jsonwebtoken");
 const{validateEditProfileData}=require("../utils/validation");
 const bcrypt = require("bcryptjs");
@@ -41,8 +41,6 @@ const bcrypt = require("bcryptjs");
 //     }catch(err){
 //     res.send("ERROR :"+err.message)
 //     }
-    
-    
 //     })
 
 profileRouter.get("/profile/view", userAuth, async (req, res) => {
