@@ -11,11 +11,11 @@ const io=socket(server,{
 
 io.on("connection",(socket)=>{
   // Handle Events
-    socket.on("joinChat",({loggedInUserId,toUserId})=>{
+    socket.on("joinChat",({firstName,loggedInUserId,toUserId})=>{
         // whenever chat happens it happens inside the room
      
          const roomId=[loggedInUserId,toUserId].sort().join("_");
-         console.log("Joining Room : "+roomId);
+         console.log(firstName+" Joining Room : "+roomId);
          socket.join(roomId);
 
     })
