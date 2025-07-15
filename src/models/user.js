@@ -73,7 +73,7 @@ userSchema.methods.getJWT = async function() {
     const user = this;
     
     try {
-        const token = await jwt.sign({ _id: user._id.toString() }, "DevPeoples#pyG4XsLkN", { expiresIn: "1d" });
+        const token = await jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET, { expiresIn: "1d" });
         return token;
     } catch (error) {
         console.error("Error in generating JWT:", error.message);

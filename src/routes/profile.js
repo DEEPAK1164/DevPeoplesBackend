@@ -53,7 +53,7 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
     }
 
     // Validate the token
-    const decodedMsg = await jwt.verify(cookies.token, "DevPeoples#pyG4XsLkN");
+    const decodedMsg = await jwt.verify(cookies.token,process.env.JWT_SECRET);
     const { _id } = decodedMsg;
     const userData = await User.findById(_id);
 

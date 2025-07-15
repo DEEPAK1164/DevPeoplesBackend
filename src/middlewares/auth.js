@@ -10,7 +10,7 @@ const userAuth = async (req, res, next) => {
       return res.status(401).send("Unauthorized, please login first");
     }
 
-    const decodedObj = await jwt.verify(token, "DevPeoples#pyG4XsLkN");
+    const decodedObj = await jwt.verify(token,process.env.JWT_SECRET);
     const { _id } = decodedObj; // Extracting the user ID from the decoded token
     const user = await User.findById(_id);
     if (!user) {
